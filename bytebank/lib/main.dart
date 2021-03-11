@@ -6,14 +6,28 @@ class ByteBank extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: FormTransfer(),
+      home: ListTransfers(),
     );
   }
 }
 
 class FormTransfer extends StatelessWidget {
-  final TextEditingController _controllerAccountNumber = TextEditingController();
+  final TextEditingController _controllerAccountNumber =
+      TextEditingController();
   final TextEditingController _controllerValue = TextEditingController();
+
+  void _createTransfer(BuildContext context) {
+    // Flutter is null safety now
+    final Transfer transfer = Transfer(
+        double.tryParse(_controllerValue.text),
+        int.tryParse(_controllerAccountNumber.text)
+    );
+
+    // Return transfer to ListTransfers
+    if(transfer.account != null && transfer.account != null){
+      Navigator.pop(context, transfer);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,35 +42,22 @@ class FormTransfer extends StatelessWidget {
         ),
         child: Column(
           children: <Widget>[
-            TextField(
-              controller: _controllerAccountNumber,
-              style: TextStyle(fontSize: 24.0),
-              decoration: InputDecoration(
-                  labelText: 'Account number', hintText: '00000-X'),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _controllerValue,
-              style: TextStyle(fontSize: 24.0),
-              decoration: InputDecoration(
-                  labelText: 'Value',
-                  hintText: '0.00',
-                  icon: Icon(Icons.monetization_on)),
-              keyboardType: TextInputType.number,
-            ),
+            Editor(
+                controller: _controllerAccountNumber,
+                label: 'Account number',
+                hint: '00000-X'),
+            Editor(
+                controller: _controllerValue,
+                label: 'Value',
+                hint: '0.00',
+                icon: Icon(Icons.monetization_on)),
             Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 8.0,
                 horizontal: 0.0,
               ),
               child: ElevatedButton(
-                onPressed: (){
-                  // Flutter is null safety now
-                  Transfer(
-                      double.tryParse(_controllerValue.text),
-                      int.tryParse(_controllerAccountNumber.text)
-                  );
-                },
+                onPressed: () => _createTransfer(context),
                 child: Text('Add'),
               ),
             )
@@ -67,22 +68,63 @@ class FormTransfer extends StatelessWidget {
   }
 }
 
-class ListTransfers extends StatelessWidget {
+class Editor extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final String hint;
+  final Icon icon;
+
+  Editor({this.controller, this.label, this.hint, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      style: TextStyle(fontSize: 24.0),
+      decoration: InputDecoration(icon: icon, labelText: label, hintText: hint),
+      keyboardType: TextInputType.number,
+    );
+  }
+}
+
+class ListTransfers extends StatefulWidget {
+  final List<Transfer> _transfers = [];
+  @override
+  State<StatefulWidget> createState() {
+    return _ListTransfersState();
+  }
+}
+
+class _ListTransfersState extends State<ListTransfers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Transfers'),
       ),
+      body: ListView.builder(
+          itemCount: widget._transfers.length,
+          itemBuilder: (context, index) {
+            final Transfer transfer =  widget._transfers[index];
+            return ItemTransfer(transfer);
+          }),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: null,
-      ),
-      body: Column(children: [
-        ItemTransfer(Transfer(100, 1)),
-        ItemTransfer(Transfer(200, 2)),
-        ItemTransfer(Transfer(300, 3)),
-      ]),
+          child: Icon(Icons.add),
+          onPressed: () {
+            final Future<Transfer> future = Navigator.push(context,
+              MaterialPageRoute(builder: (context) {
+                return FormTransfer();
+              }),
+            );
+            // Get transfer from FormTransfer
+            future.then((transfer) {
+              if(transfer != null){
+                setState(() {
+                  widget._transfers.add(transfer);
+                });
+              }
+            });
+          }),
     );
   }
 }
