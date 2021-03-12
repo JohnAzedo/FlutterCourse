@@ -11,9 +11,15 @@ class ByteBank extends StatelessWidget {
   }
 }
 
-class FormTransfer extends StatelessWidget {
-  final TextEditingController _controllerAccountNumber =
-      TextEditingController();
+class FormTransfer extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _FormTransferState();
+  }
+}
+
+class _FormTransferState extends State<FormTransfer> {
+  final TextEditingController _controllerAccountNumber = TextEditingController();
   final TextEditingController _controllerValue = TextEditingController();
 
   void _createTransfer(BuildContext context) {
@@ -24,7 +30,7 @@ class FormTransfer extends StatelessWidget {
     );
 
     // Return transfer to ListTransfers
-    if(transfer.account != null && transfer.account != null){
+    if (transfer.account != null && transfer.account != null) {
       Navigator.pop(context, transfer);
     }
   }
@@ -40,28 +46,30 @@ class FormTransfer extends StatelessWidget {
           vertical: 8.0,
           horizontal: 16.0,
         ),
-        child: Column(
-          children: <Widget>[
-            Editor(
-                controller: _controllerAccountNumber,
-                label: 'Account number',
-                hint: '00000-X'),
-            Editor(
-                controller: _controllerValue,
-                label: 'Value',
-                hint: '0.00',
-                icon: Icon(Icons.monetization_on)),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 0.0,
-              ),
-              child: ElevatedButton(
-                onPressed: () => _createTransfer(context),
-                child: Text('Add'),
-              ),
-            )
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Editor(
+                  controller: _controllerAccountNumber,
+                  label: 'Account number',
+                  hint: '00000-X'),
+              Editor(
+                  controller: _controllerValue,
+                  label: 'Value',
+                  hint: '0.00',
+                  icon: Icon(Icons.monetization_on)),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 0.0,
+                ),
+                child: ElevatedButton(
+                  onPressed: () => _createTransfer(context),
+                  child: Text('Add'),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -89,6 +97,7 @@ class Editor extends StatelessWidget {
 
 class ListTransfers extends StatefulWidget {
   final List<Transfer> _transfers = [];
+
   @override
   State<StatefulWidget> createState() {
     return _ListTransfersState();
@@ -105,7 +114,7 @@ class _ListTransfersState extends State<ListTransfers> {
       body: ListView.builder(
           itemCount: widget._transfers.length,
           itemBuilder: (context, index) {
-            final Transfer transfer =  widget._transfers[index];
+            final Transfer transfer = widget._transfers[index];
             return ItemTransfer(transfer);
           }),
       floatingActionButton: FloatingActionButton(
@@ -118,7 +127,7 @@ class _ListTransfersState extends State<ListTransfers> {
             );
             // Get transfer from FormTransfer
             future.then((transfer) {
-              if(transfer != null){
+              if (transfer != null) {
                 setState(() {
                   widget._transfers.add(transfer);
                 });
