@@ -1,3 +1,4 @@
+import 'package:bytebanksql/components/progress.dart';
 import 'package:bytebanksql/database/dao/contact.dart';
 import 'package:bytebanksql/database/db.dart';
 import 'package:bytebanksql/models/contact.dart';
@@ -22,13 +23,7 @@ class ContactList extends StatelessWidget {
             case ConnectionState.none:
               break;
             case ConnectionState.waiting:
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [CircularProgressIndicator(), Text('Loading')],
-                ),
-              );
+              return Progress();
               break;
             case ConnectionState.active:
               break;
