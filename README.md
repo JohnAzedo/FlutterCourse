@@ -1,2 +1,2 @@
 # FlutterCourse
-Flutter course offered by alura
+Flutter course offered by alura.
